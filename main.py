@@ -1,6 +1,7 @@
 import os
 import discord
 from discord.ext import commands
+import requests
 
 from PIL import Image, ImageDraw, ImageFont, ImageColor
 
@@ -35,15 +36,19 @@ async def make(ctx, *args):
       current += f" {input}"
   if len(current) > 0:
     response.append(current)
+
+  coordinates = getImage(response[0].strip())
   
-  formImage(response[0].strip(), response[1:], [[100, 100], [500, 500]], ctx.author)
+  formImage(response[0].strip(), response[1:], coordinates, ctx.author)
   with open(f'./memes/{ctx.author}.png', "rb") as fh:
     f = discord.File(fh, filename=f'./memes/{ctx.author}.png')
   await ctx.send(file=f)
 
+  os.remove(f'./memes/{ctx.author}.png')
+
 def formImage(memename, texts, coordinates, author):
-    font = ImageFont.truetype("./CALIBRI.TTF", size=72)
-    
+    font = ImageFont.truetype("./CALIBRI.TTF", size=120)
+
     image = Image.open(f"./{memename}.png")
 
     # creating a draw object
@@ -59,6 +64,22 @@ def formImage(memename, texts, coordinates, author):
     # image.show()
     image.save(f'./memes/{author}.png')
 
+def getImage(memename):
+  print(memename)
+  response = requests.get(f"https://6ofin9gps1.execute-api.ap-south-1.amazonaws.com/dev/api/meme/get?tag={memename}").json()
+  print(response)
+
+  imageResponse = requests.get(response['data'][0]['image_url']).content
+  f = open(f"./{memename}.png", "wb")
+  f.write(imageResponse)
+  f.close()
+
+  coordinates = []
+  for i in response['data']:
+    coordinates.append([int(i['x']), int(i['y'])])
+  
+  return coordinates
+  
 
 # Run the bot with your token
 bot.run(os.environ['TOKEN'])
