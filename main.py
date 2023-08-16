@@ -2,6 +2,9 @@ import os
 import discord
 from discord.ext import commands
 import requests
+from dotenv import load_dotenv
+
+load_dotenv()
 
 from PIL import Image, ImageDraw, ImageFont, ImageColor
 
@@ -45,8 +48,6 @@ async def make(ctx, *args):
   print(response[1:])
   await ctx.send(file=f)
 
-  os.remove(f'./memes/{ctx.author}.png')
-
 def formImage(memename, texts, coordinates, author):
     font = ImageFont.truetype("./CALIBRI.TTF", size=120)
 
@@ -84,4 +85,4 @@ def getImage(memename):
   
 
 # Run the bot with your token
-bot.run(os.environ['TOKEN'])
+bot.run(os.getenv('TOKEN'))
