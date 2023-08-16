@@ -42,6 +42,7 @@ async def make(ctx, *args):
   formImage(response[0].strip(), response[1:], coordinates, ctx.author)
   with open(f'./memes/{ctx.author}.png', "rb") as fh:
     f = discord.File(fh, filename=f'./memes/{ctx.author}.png')
+  print(response[1:])
   await ctx.send(file=f)
 
   os.remove(f'./memes/{ctx.author}.png')
@@ -67,6 +68,7 @@ def formImage(memename, texts, coordinates, author):
 def getImage(memename):
   print(memename)
   response = requests.get(f"https://6ofin9gps1.execute-api.ap-south-1.amazonaws.com/dev/api/meme/get?tag={memename}").json()
+
   print(response)
 
   imageResponse = requests.get(response['data'][0]['image_url']).content
